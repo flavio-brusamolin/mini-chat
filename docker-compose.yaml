@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:13
+    container_name: mini-chat-db
+    restart: always
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+      POSTGRES_DB: mini-chat
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  cache:
+    image: redis:6
+    container_name: mini-chat-cache
+    restart: always
+    ports:
+      - 6379:6379
+
+  message-queue:
+    image: rabbitmq:3-management
+    container_name: mini-chat-message-queue
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbituser
+      RABBITMQ_DEFAULT_PASS: rabbitpass
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: mini-chat-server
+    restart: always
+    environment:
+      PORT: 3030
+      POSTGRES_URL: postgres://pguser:pgpass@db:5432/mini-chat
+      REDIS_URL: redis://cache:6379
+      RABBITMQ_URL: amqp://rabbituser:rabbitpass@message-queue:5672
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+    ports:
+      - 3030:3030
+    depends_on:
+      - db
+      - cache
+      - message-queue
+
+  email-worker:
+    build:
+      context: ./email-worker
+      dockerfile: Dockerfile.dev
+    container_name: mini-chat-email-worker
+    restart: always
+    environment:
+      RABBITMQ_URL: amqp://rabbituser:rabbitpass@message-queue:5672
+    volumes:
+      - ./email-worker:/email-worker
+      - /email-worker/node_modules
+    depends_on:
+      - message-queue
+
+volumes:
+  postgres:

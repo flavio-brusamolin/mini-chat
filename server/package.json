@@ -1,0 +1,22 @@
+{
+  "name": "mini-chat-server",
+  "version": "1.0.0",
+  "description": "Mini chat server",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "migrate": "npx knex migrate:latest",
+    "migrate:rollback": "npx knex migrate:rollback"
+  },
+  "author": "Flavio Brusamolin",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.10.7",
+    "express": "^5.1.0",
+    "knex": "^3.1.0",
+    "pg": "^8.14.1",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
