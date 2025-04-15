@@ -1,9 +1,9 @@
-const EmailService = require('../../app/email-service');
+const SendEmailService = require('../../app/send-email-service');
 const EmailProvider = require('../../infra/email/email-provider');
 const UserCreatedHandler = require('../../interfaces/amqp/user-created-handler');
 
 const emailProvider = new EmailProvider();
-const emailService = new EmailService(emailProvider);
-const userCreatedHandler = new UserCreatedHandler(emailService);
+const sendEmailService = new SendEmailService(emailProvider);
+const userCreatedHandler = new UserCreatedHandler(sendEmailService);
 
 module.exports = userCreatedHandler;

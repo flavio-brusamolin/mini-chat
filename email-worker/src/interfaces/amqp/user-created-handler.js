@@ -1,10 +1,10 @@
 class UserCreatedHandler {
-  constructor(emailService) {
-    this.emailService = emailService;
+  constructor(sendEmailService) {
+    this.sendEmailService = sendEmailService;
   }
 
   async handle(user) {
-    await this.emailService.sendWelcomeEmail(user);
+    await this.sendEmailService.execute(user);
   }
 }
 

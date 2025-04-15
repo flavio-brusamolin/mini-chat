@@ -1,12 +1,12 @@
 const path = require('path');
 const fs = require('fs');
 
-class EmailService {
+class SendEmailService {
   constructor(emailProvider) {
     this.emailProvider = emailProvider;
   }
 
-  async sendWelcomeEmail(user) {
+  async execute(user) {
     console.log(`Sending email to ${user.email}`);
 
     const emailPath = path.join(__dirname, 'welcome-email.html');
@@ -23,4 +23,4 @@ class EmailService {
   }
 }
 
-module.exports = EmailService;
+module.exports = SendEmailService;
