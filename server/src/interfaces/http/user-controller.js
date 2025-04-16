@@ -3,15 +3,18 @@ class UserController {
     this.createUserService = createUserService;
   }
 
-  async create(req, res) {
-    const user = req.body;
+  async create(httpRequest) {
+    const user = httpRequest.body;
 
     try {
       const createdUser = await this.createUserService.execute(user);
-      res.status(201).json(createdUser);
+      return { statusCode: 201, body: createdUser };
     } catch (exception) {
-      const error = { error: exception.message };
-      res.status(500).json(error);
+      console.error(exception);
+      return {
+        statusCode: 500,
+        body: { error: exception.message },
+      };
     }
   }
 }
