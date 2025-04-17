@@ -1,5 +1,5 @@
 const { connect } = require('amqplib');
-const enumEvent = require('../../app/enum-event');
+const enumEvent = require('../../app/enum/enum-event');
 
 let instance;
 

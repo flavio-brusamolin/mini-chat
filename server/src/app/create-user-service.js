@@ -1,4 +1,4 @@
-const { USER_CREATED } = require('./enum-event');
+const { USER_CREATED } = require('./enum/enum-event');
 
 class CreateUserService {
   constructor({ userRepository, messageQueueClient }) {

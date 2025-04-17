@@ -1,24 +1,45 @@
 const { WebSocketServer } = require('ws');
+const WebSocketClient = require('./websocket-client');
+const { INTERNAL_ERROR } = require('./error-code');
 
 class WsServer {
-  INTERNAL_ERROR = 1011;
-
-  constructor({ server, onConnectionHandler }) {
+  constructor({ server, onConnectionHandler, onMessageHandler }) {
     this.onConnectionHandler = onConnectionHandler;
-    this.wsServer = new WebSocketServer({ server });
-    this.wsServer.on('connection', (socket, req) => this.handleConnection(socket, req));
+    this.onMessageHandler = onMessageHandler;
+    this.websocketClient = new WebSocketClient();
+
+    const websocketServer = new WebSocketServer({ server });
+    websocketServer.on('connection', (socket, req) => this.manageConnection(socket, req));
   }
 
-  async handleConnection(socket, req) {
+  async manageConnection(socket, req) {
     try {
-      const params = this.extractParams(req.url);
-      const response = await this.onConnectionHandler(params);
-      socket.send(JSON.stringify(response));
+      const { user_id: userId } = this.extractParams(req.url);
+      if (!userId) {
+        throw new Error('user_id is required');
+      }
+
+      await this.handleConnection(userId, socket);
+      socket.on('message', (data) => this.handleMessage(userId, data));
+      socket.on('close', () => this.handleClose(socket));
     } catch (exception) {
       console.error(exception);
       socket.send(JSON.stringify({ error: exception.message }));
-      socket.close(this.INTERNAL_ERROR);
+      socket.close(INTERNAL_ERROR);
     }
+  }
+
+  async handleConnection(userId, socket) {
+    this.websocketClient.add(userId, socket);
+    await this.onConnectionHandler(userId);
+  }
+
+  async handleMessage(userId, data) {
+    await this.onMessageHandler(userId, data.toString());
+  }
+
+  handleClose(socket) {
+    this.websocketClient.remove(socket);
   }
 
   extractParams(url) {

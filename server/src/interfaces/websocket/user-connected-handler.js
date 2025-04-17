@@ -1,15 +1,10 @@
 class UserConnectedHandler {
-  constructor(getMessageHistoryService) {
-    this.getMessageHistoryService = getMessageHistoryService;
+  constructor(deliverMessageHistoryService) {
+    this.deliverMessageHistoryService = deliverMessageHistoryService;
   }
 
-  async handle(connectionParams) {
-    const { user_id: userId } = connectionParams;
-    if (!userId) {
-      throw new Error('user_id is required');
-    }
-
-    return await this.getMessageHistoryService.execute(userId);
+  async handle(connectedUserId) {
+    await this.deliverMessageHistoryService.execute(connectedUserId);
   }
 }
 
